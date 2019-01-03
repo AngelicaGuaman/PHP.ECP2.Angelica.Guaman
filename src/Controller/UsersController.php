@@ -2,6 +2,14 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManager;
+use MiW\Results\Entity\User;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+
 /**
  * Class UsersController
  *
@@ -12,9 +20,9 @@ namespace App\Controller;
 class UsersController extends AbstractController
 {
 
-	public const API_USER = '/api/v1/users';
-	
-	/**
+    public const API_USER = '/api/v1/users';
+
+    /**
      * @Route(path="", name="getAll", methods={ Request::METHOD_GET })
      * @return JsonResponse
      */
@@ -27,31 +35,32 @@ class UsersController extends AbstractController
         return (null === $users)
             ? $this->error(Response::HTTP_NOT_FOUND, 'NOT FOUND')
             : new JsonResponse(
-                [ 'users' => $users ]
+                ['users' => $users]
             );
     }
-	
-	/**
+
+    /**
      * @Route(path="/{id}", name="get_one_user", methods={ Request::METHOD_GET })+
-	 * @param User|null $user
+     * @param User|null $user
      * @return JsonResponse
      */
     public function findById(?User $user): JsonResponse
     {
-        //        /** @var User $user */
-		//        $user = $this->getDoctrine()
-		//            ->getRepository(User::class)
-		//            ->find($id);
+        ///** @var User $user */
+        //$user = $this->getDoctrine()
+        //  ->getRepository(User::class)
+        //  ->find($id);
         return (null === $user)
             ? $this->error(Response::HTTP_NOT_FOUND, 'NOT FOUND')
             : new JsonResponse(
                 $user
             );
     }
-	
-	 /**
+
+    /**
      * @Route(path="", name="post", methods={ Request::METHOD_POST })
      * @return JsonResponse
+     * @throws \Doctrine\ORM\ORMException
      */
     public function postUser(Request $request): JsonResponse
     {
@@ -59,13 +68,13 @@ class UsersController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $datosPeticion = $request->getContent();
         $datos = json_decode($datosPeticion, true);
-		
-		$username = $datos['username'] ?? null;
+
+        $username = $datos['username'] ?? null;
         $email = $datos['email'] ?? null;
         $enabled = $datos['enabled'] ?? null;
         $password = $datos['password'] ?? null;
         $admin = $datos['admin'] ?? false;
-		
+
         // Error: falta USERNAME
         if (null === $username) {
             return $this->error(Response::HTTP_UNPROCESSABLE_ENTITY, 'Falta USERNAME');
@@ -73,35 +82,35 @@ class UsersController extends AbstractController
 
         // Error: USERNAME ya existe
         /** @var User $user */
-		$user = $em->getRepository(User::class)->findOneBy(['username' => $username]);
+        $user = $em->getRepository(User::class)->findOneBy(['username' => $username]);
         if (null !== $user) {
             return $this->error(Response::HTTP_BAD_REQUEST, 'USERNAME ya existe');
         }
-		
-		// Error: falta EMAIL
+
+        // Error: falta EMAIL
         if (null === $email) {
             return $this->error(Response::HTTP_UNPROCESSABLE_ENTITY, 'Falta EMAIL');
         }
 
         // Error: EMAIL ya existe
         /** @var User $user */
-		$user = $em->getRepository(User::class)->findOneBy(['email' => $email]);
+        $user = $em->getRepository(User::class)->findOneBy(['email' => $email]);
         if (null !== $user) {
             return $this->error(Response::HTTP_BAD_REQUEST, 'EMAIL ya existe');
         }
-		
-		// Error: falta PASSWORD
+
+        // Error: falta PASSWORD
         if (null === $password) {
             return $this->error(Response::HTTP_UNPROCESSABLE_ENTITY, 'Falta PASSWORD');
         }
-		
-		// Error: falta ENABLED
+
+        // Error: falta ENABLED
         if (null === $enabled) {
             return $this->error(Response::HTTP_UNPROCESSABLE_ENTITY, 'Falta ENABLED');
         }
 
         // Crear User
-        $user = new User($username, $email, $password, $enabled,$admin);
+        $user = new User($username, $email, $password, $enabled, $admin);
 
         // Hacerla persistente
         $em->persist($user);
@@ -110,29 +119,30 @@ class UsersController extends AbstractController
         // devolver respuesta
         return new JsonResponse($user, Response::HTTP_CREATED);
     }
-	
-	 /**
+
+    /**
      * @Route(path="/{id}", name="put", methods={ Request::METHOD_PUT })
-	 * @param User|null $user
+     * @param User|null $user
      * @return JsonResponse
+     * @throws \Doctrine\ORM\ORMException
      */
     public function putUser(?User $user, Request $request): JsonResponse
     {
-		if (null === $user) {
+        if (null === $user) {
             return $this->error(Response::HTTP_NOT_FOUND, 'NOT FOUND');
         }
-		
+
         /** @var EntityManager $em */
         $em = $this->getDoctrine()->getManager();
         $datosPeticion = $request->getContent();
         $datos = json_decode($datosPeticion, true);
-		
-		$username = $datos['username'] ?? null;
+
+        $username = $datos['username'] ?? null;
         $email = $datos['email'] ?? null;
         $enabled = $datos['enabled'] ?? null;
         $password = $datos['password'] ?? null;
         $admin = $datos['admin'] ?? false;
-		
+
         // Error: falta USERNAME
         if (null === $username) {
             return $this->error(Response::HTTP_UNPROCESSABLE_ENTITY, 'Falta USERNAME');
@@ -140,39 +150,39 @@ class UsersController extends AbstractController
 
         // Error: USERNAME ya existe
         /** @var User $userPersist */
-		$userPersist = $em->getRepository(User::class)->findOneBy(['username' => $username]);
+        $userPersist = $em->getRepository(User::class)->findOneBy(['username' => $username]);
         if (null !== $userPersist) {
             return $this->error(Response::HTTP_BAD_REQUEST, 'USERNAME ya existe');
         }
-		
-		// Error: falta EMAIL
+
+        // Error: falta EMAIL
         if (null === $email) {
             return $this->error(Response::HTTP_UNPROCESSABLE_ENTITY, 'Falta EMAIL');
         }
 
         // Error: EMAIL ya existe
         /** @var User $userPersist */
-		$userPersist = $em->getRepository(User::class)->findOneBy(['email' => $email]);
+        $userPersist = $em->getRepository(User::class)->findOneBy(['email' => $email]);
         if (null !== $userPersist) {
             return $this->error(Response::HTTP_BAD_REQUEST, 'EMAIL ya existe');
         }
-		
-		// Error: falta PASSWORD
+
+        // Error: falta PASSWORD
         if (null === $password) {
             return $this->error(Response::HTTP_UNPROCESSABLE_ENTITY, 'Falta PASSWORD');
         }
-		
-		// Error: falta ENABLED
+
+        // Error: falta ENABLED
         if (null === $enabled) {
             return $this->error(Response::HTTP_UNPROCESSABLE_ENTITY, 'Falta ENABLED');
         }
 
         // Modificar User
         $user->setUsername($username);
-		$user->setEmail($email);
-		$user->setPassword($password);
-		$user->setEnabled($enabled);
-		$user->setIsAdmin(,$admin);
+        $user->setEmail($email);
+        $user->setPassword($password);
+        $user->setEnabled($enabled);
+        $user->setIsAdmin($admin);
 
         // Hacerla persistente
         $em->persist($user);
@@ -182,7 +192,7 @@ class UsersController extends AbstractController
         return new JsonResponse($user, Response::HTTP_OK);
     }
 
-	/**
+    /**
      * @Route(path="/{id}", name="delete", methods={ Request::METHOD_DELETE })
      * @param User|null $user
      * @return JsonResponse
@@ -190,37 +200,37 @@ class UsersController extends AbstractController
     public function deleteOneUser(?User $user): JsonResponse
     {
         $em = $this->getDoctrine()->getManager();
-        if(null === $user) {
+        if (null === $user) {
             return $this->error(Response::HTTP_NOT_FOUND, 'NOT FOUND');
         } else {
             $em->remove($user);
             $em->flush();
-            return new JsonResponse( null, Response::HTTP_NO_CONTENT);
+            return new JsonResponse(null, Response::HTTP_NO_CONTENT);
         }
     }
-	
-	/**
+
+    /**
      * @Route(path="/{id}", name="deleteAll", methods={ Request::METHOD_DELETE })
      * @return JsonResponse
      */
     public function deleteAllUsers(): JsonResponse
     {
         $em = $this->getDoctrine()->getManager();
-		
-		/** @var User[] $users */
+
+        /** @var User[] $users */
         $users = $this->getDoctrine()
             ->getRepository(User::class)
             ->findAll();
-			
-        foreach($users as $user){
-			$em->remove($user);
+
+        foreach ($users as $user) {
+            $em->remove($user);
             $em->flush();
-		}
-		
-		return new JsonResponse( null, Response::HTTP_NO_CONTENT);
+        }
+
+        return new JsonResponse(null, Response::HTTP_NO_CONTENT);
     }
-	
-	/**
+
+    /**
      * @param int $statusCode
      * @param string $message
      *
@@ -238,6 +248,6 @@ class UsersController extends AbstractController
             $statusCode
         );
     }
-	
+
 
 }
