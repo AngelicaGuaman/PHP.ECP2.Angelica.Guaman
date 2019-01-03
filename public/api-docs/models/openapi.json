@@ -441,7 +441,7 @@
             "id": 1508,
             "username": "User name",
             "email": "User email",
-			"password": "*user*"
+			"password": "*user*",
             "enabled": true,
             "admin": false
           }, 
@@ -473,7 +473,7 @@
             "id": 1508,
             "username": "User name",
             "email": "User email",
-			"password": "*user*"
+			"password": "*user*",
             "enabled": true,
             "admin": false
           }, 
