@@ -34,19 +34,19 @@
           }
         }
       },
-	  "delete":{
-		"tags": [
-			"Users"
-		],
-		"summary": "Deletes all users",
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Deletes all users",
         "description": "Deletes all users from the system that the user has access to.",
         "operationId": "api_user_deleteAll",
-		"responses": {
+        "responses": {
           "204": {
             "description": "User deleted"
           }
         }
-	  },
+      },
       "post": {
         "tags": [
           "Users"
@@ -274,7 +274,7 @@
           }
         }
       },
-      "delete":{
+      "delete": {
         "tags": [
           "Results"
         ],
@@ -305,18 +305,11 @@
               }
             }
           },
-          "400": {
-            "description": "`Bad Request` Username or email already exists.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Message"
-                }
-              }
-            }
+          "404": {
+            "$ref": "#/components/responses/404_Resource_Not_Found_Response"
           },
           "422": {
-            "description": "`Unprocessable entity` Username, e-mail or password is left out",
+            "description": "`Unprocessable entity` Result or user is left out",
             "content": {
               "application/json": {
                 "schema": {
@@ -345,6 +338,129 @@
         "summary": "Provides the list of HTTP supported methods",
         "description": "Return a `Allow` header with a list of HTTP supported methods.",
         "operationId": "api_result_options",
+        "responses": {
+          "200": {
+            "description": "`Allow` header ",
+            "headers": {
+              "allow": {
+                "description": "List of HTTP supported methods",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/results/{resultId}": {
+      "get": {
+        "tags": [
+          "Results"
+        ],
+        "summary": "Returns a result based on a single ID",
+        "description": "Returns the result identified by `resultId`.",
+        "operationId": "api_result_get_one_result",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/resultId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Result"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/404_Resource_Not_Found_Response"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Results"
+        ],
+        "summary": "Updates a result",
+        "description": "Updates the result identified by `resultId`.",
+        "operationId": "api_result_put",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/resultId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "`Content Returned` Result previously existed and is now updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultData"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/404_Resource_Not_Found_Response"
+          },
+          "422": {
+            "description": "`Unprocessable entity` Username, e-mail or password is left out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResultData"
+              }
+            }
+          },
+          "description": "`Result` data to update",
+          "required": true
+        }
+      },
+      "delete": {
+        "tags": [
+          "Results"
+        ],
+        "summary": "Deletes a result",
+        "description": "Deletes the result identified by `resultId`.",
+        "operationId": "api_user_delete",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/resultId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Result deleted"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Provides the list of HTTP supported methods",
+        "description": "Return a `Allow` header with a list of HTTP supported methods.",
+        "operationId": "api_user_options_id",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userId"
+          }
+        ],
         "responses": {
           "200": {
             "description": "`Allow` header ",
@@ -388,10 +504,10 @@
           "format": "int32"
         }
       },
-	  "resultId": {
+      "resultId": {
         "name": "resultId",
         "in": "path",
-        "description": "ID of user",
+        "description": "ID of result",
         "required": true,
         "schema": {
           "type": "integer",
@@ -435,9 +551,9 @@
       "User": {
         "required": [
           "username",
-          "email", 
-		  "password",
-		  "enabled"
+          "email",
+          "password",
+          "enabled"
         ],
         "properties": {
           "id": {
@@ -473,11 +589,11 @@
         }
       },
       "UserData": {
-		"required": [
+        "required": [
           "username",
-          "email", 
-		  "password",
-		  "enabled"
+          "email",
+          "password",
+          "enabled"
         ],
         "properties": {
           "username": {
@@ -521,14 +637,14 @@
           }
         }
       },
-	  "Result": {
+      "Result": {
         "required": [
           "user",
-		  "result"
+          "result"
         ],
         "properties": {
           "id": {
-            "description": "Reult Id",
+            "description": "Result Id",
             "type": "integer",
             "format": "int32"
           },
@@ -546,23 +662,23 @@
           }
         },
         "example": {
-		  "id": 1990,
+          "id": 1990,
           "user": {
             "id": 1508,
             "username": "User name",
             "email": "User email",
-			"password": "*user*",
+            "password": "*user*",
             "enabled": true,
             "admin": false
-          }, 
-		  "result": 240,
-		  "time": "2018-01-03 14:14:00"
+          },
+          "result": 240,
+          "time": "2018-01-03 14:14:00"
         }
       },
-	   "ResultData": {
+      "ResultData": {
         "required": [
           "user_id",
-		  "result"
+          "result"
         ],
         "properties": {
           "user_id": {
@@ -576,7 +692,7 @@
         },
         "example": {
           "user_id": 1,
-		  "result": 240
+          "result": 240
         }
       },
       "ResultArray": {
@@ -590,7 +706,7 @@
           }
         }
       },
-	  "Message": {
+      "Message": {
         "required": [
           "code",
           "message"

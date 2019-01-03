@@ -119,7 +119,7 @@ class ApiResultController extends AbstractController
         $datosPeticion = $request->getContent();
         $datos = json_decode($datosPeticion, true);
 
-        $userId = $datos['user'] ?? null;
+        $userId = $datos['user_id'] ?? null;
         $points = $datos['result'] ?? null;
         $time = new \DateTime('now');
 
