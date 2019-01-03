@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use Doctrine\ORM\EntityManager;
-use MiW\Results\Entity\Result;
-use MiW\Results\Entity\User;
+use App\Entity\Result;
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;

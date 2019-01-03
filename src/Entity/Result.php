@@ -4,13 +4,13 @@
  * src\Entity\Result.php
  *
  * @category Entities
- * @package  MiW\Results\Entity
+ * @package  App\Entity
  * @author   Javier Gil <franciscojavier.gil@upm.es>
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     http://www.etsisi.upm.es ETS de Ingeniería de Sistemas Informáticos
  */
 
-namespace MiW\Results\Entity;
+namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 

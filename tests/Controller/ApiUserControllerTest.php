@@ -1,9 +1,12 @@
 <?php
 
-namespace MiW\Results\Tests\Controller;
+namespace App\Tests\Controller;
 
-use MiW\Results\Entity\User;
-use PHPUnit\Framework\TestCase;
+use App\Controller\UsersController;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\BrowserKit\Client;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class ApiUserControllerTest
@@ -29,7 +32,7 @@ class ApiUserControllerTest extends WebTestCase
     {
         self::$client->request(
             Request::METHOD_GET,
-            ApiPersonaController::API_USER
+            UsersController::API_USER
         );
         /** @var Response $response */
         $response = self::$client->getResponse();
@@ -39,25 +42,27 @@ class ApiUserControllerTest extends WebTestCase
         );
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
-        self::assertArrayHasKey('personas', $datosRecibidos);
+        self::assertArrayHasKey('users', $datosRecibidos);
+        dump($datosRecibidos, '<<<<<< GET ALL USERS 200');
     }
 
     /**
-     *
+     * @Implements testPostUser201
+     * @covers ::postUser
      * @return int
      */
     public function testPostUser201(): int
     {
         $datos = [
-            'username' => 'angelica',
-            'email' => 'angelica.@xyz.com',
-			'password' => '*angelica*',
-			'enabled' => false,
-			'admin' => false
+            'username' => '555angelica',
+            'email' => '555angelica.@xyz.com',
+            'password' => '*angelica*',
+            'enabled' => false,
+            'admin' => false
         ];
         self::$client->request(
             Request::METHOD_POST,
-            ApiUserController::API_USER,
+            UsersController::API_USER,
             [], [], [], json_encode($datos)
         );
         /** @var Response $response */
@@ -68,52 +73,61 @@ class ApiUserControllerTest extends WebTestCase
         );
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
-        self::assertArrayHasKey('persona', $datosRecibidos);
         self::assertEquals($datos['username'], $datosRecibidos['username']);
-		self::assertEquals($datos['email'], $datosRecibidos['email']);
-		self::assertEquals($datos['enabled'], $datosRecibidos['enabled']);
-		self::assertEquals($datos['isAdmin'], $datosRecibidos['isAdmin']);
+        self::assertEquals($datos['email'], $datosRecibidos['email']);
+        self::assertEquals($datos['enabled'], $datosRecibidos['enabled']);
+        self::assertEquals($datos['admin'], $datosRecibidos['admin']);
 
-        return $datos['id'];
+        dump($datosRecibidos, '<<<<<< POST USER 200');
+        return $datosRecibidos['id'];
     }
 
     /**
+     * @Implements testPostUser422
      * @depends testPostUser201
-     * @param int $id
+     * @covers ::postUser
+     * @covers ::error
      */
-    public function testPostUser400(int $id)
+    public function testPostUser422(): void
     {
         $datos = [
-            'id' => $id
+            'username' => '555angelica',
+            'email' => '555angelica.@xyz.com',
+            'password' => '*angelica*',
+            'enabled' => false,
+            'admin' => false
         ];
         self::$client->request(
             Request::METHOD_POST,
-            ApiUserController::API_USER,
+            UsersController::API_USER,
             [], [], [], json_encode($datos)
         );
         /** @var Response $response */
         $response = self::$client->getResponse();
         self::assertEquals(
-            Response::HTTP_BAD_REQUEST,
+            Response::HTTP_UNPROCESSABLE_ENTITY,
             $response->getStatusCode()
         );
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
-        self::assertArrayHasKey('message', $datosRecibidos);
-        self::assertArrayHasKey('code', $datosRecibidos['message']);
+        self::assertEquals(422, $datosRecibidos["message"]["code"]);
+        self::assertEquals("Falta USERNAME", $datosRecibidos["message"]["message"]);
+
+        dump($datosRecibidos, '<<<<<< POST USER 422');
     }
 
     /**
-     * Implements testGetPersona200
-     * @depends testPostPersona201
-     * @covers ::getPersona
-     * @param int $dni
+     * @Implements testGetUser200
+     * @depends testPostUser201
+     * @covers ::findById
+     * @param int $id
+     * @return array $user
      */
-    public function testGetPersona200(int $dni)
+    public function testGetUser200(int $id): array
     {
         self::$client->request(
             Request::METHOD_GET,
-            ApiPersonaController::API_PERSONA . '/' . $dni
+            UsersController::API_USER . '/' . $id
         );
         /** @var Response $response */
         $response = self::$client->getResponse();
@@ -123,31 +137,44 @@ class ApiUserControllerTest extends WebTestCase
         );
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
-        self::assertArrayHasKey('persona', $datosRecibidos);
-        self::assertArrayHasKey('dni', $datosRecibidos['persona']);
-        self::assertEquals($dni, $datosRecibidos['persona']['dni']);
+        self::assertArrayHasKey('id', $datosRecibidos);
+        self::assertArrayHasKey('username', $datosRecibidos);
+        self::assertArrayHasKey('email', $datosRecibidos);
+        self::assertArrayHasKey('enabled', $datosRecibidos);
+        self::assertArrayHasKey('admin', $datosRecibidos);
+        self::assertEquals($id, $datosRecibidos['id']);
+
+        dump($datosRecibidos, '<<<<<< GET USER 200');
+
+        return $datosRecibidos;
     }
 
     /**
-     * Implements testGetPersona404
-     * @covers ::getPersona
+     * Implements testGetUser404
+     * @covers ::findById
      * @covers ::error
      */
-    public function testGetPersona404()
+    public function testGetUser404()
     {
-        self::markTestIncomplete(
-            'This test has not been implemented yet.'
+        $id = -1;
+
+        self::$client->request(
+            Request::METHOD_GET,
+            UsersController::API_USER . '/' . $id
         );
+        /** @var Response $response */
+        $response = self::$client->getResponse();
+        self::assertEquals(
+            Response::HTTP_NOT_FOUND,
+            $response->getStatusCode()
+        );
+        self::assertJson($response->getContent());
+        $datosRecibidos = json_decode($response->getContent(), true);
+        self::assertEquals(404, $datosRecibidos["message"]["code"]);
+        self::assertEquals("NOT FOUND", $datosRecibidos["message"]["message"]);
+
+        dump($datosRecibidos, '<<<<<< GET USER 404');
     }
 
-    /**
-     * Proveedor de datos de persona
-     * @return array
-     */
-    public function proveedorPersonas(): array
-    {
-        return [
-           'user1' => [ '876132504', 'nombre,hbchdc', 'hgdsakf@xyz.com' ],
-        ];
-    }
+
 }

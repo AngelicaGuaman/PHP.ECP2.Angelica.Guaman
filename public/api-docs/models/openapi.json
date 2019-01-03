@@ -347,7 +347,7 @@
             "description": "Denotes if user is enabled",
             "type": "boolean"
           },
-          "isAdmin": {
+          "admin": {
             "description": "Denotes if user has admin privileges",
             "type": "boolean"
           }
@@ -387,7 +387,7 @@
             "description": "Denotes if user is enabled",
             "type": "boolean"
           },
-          "isAdmin": {
+          "admin": {
             "description": "Denotes if user has admin privileges",
             "type": "boolean"
           }
@@ -397,7 +397,7 @@
           "email": "User_email@example.com",
           "password": "User_password",
           "enabled": true,
-          "isAdmin": false
+          "admin": false
         }
       },
       "UsersArray": {
