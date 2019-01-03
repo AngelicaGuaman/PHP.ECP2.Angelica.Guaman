@@ -4,16 +4,16 @@
  * tests/Entity/ResultTest.php
  *
  * @category EntityTests
- * @package  MiW\Results\Tests
+ * @package  App\Tests
  * @author   Javier Gil <franciscojavier.gil@upm.es>
  * @license  https://opensource.org/licenses/MIT MIT License
  * @link     http://www.etsisi.upm.es ETS de Ingeniería de Sistemas Informáticos
  */
 
-namespace MiW\Results\Tests\Entity;
+namespace App\Tests\Entity;
 
-use MiW\Results\Entity\Result;
-use MiW\Results\Entity\User;
+use App\Entity\Result;
+use App\Entity\User;
 
 /**
  * Class ResultTest

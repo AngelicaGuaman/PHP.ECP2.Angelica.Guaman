@@ -210,7 +210,7 @@ class UsersController extends AbstractController
     }
 
     /**
-     * @Route(path="/{id}", name="deleteAll", methods={ Request::METHOD_DELETE })
+     * @Route(path="", name="deleteAll", methods={ Request::METHOD_DELETE })
      * @return JsonResponse
      */
     public function deleteAllUsers(): JsonResponse

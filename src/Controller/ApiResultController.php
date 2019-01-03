@@ -70,7 +70,7 @@ class ApiResultController extends AbstractController
         $datosPeticion = $request->getContent();
         $datos = json_decode($datosPeticion, true);
 
-        $userId = $datos['user'] ?? null;
+        $userId = $datos['user_id'] ?? null;
         $points = $datos['result'] ?? null;
         $time = new \DateTime('now');
 
@@ -106,6 +106,7 @@ class ApiResultController extends AbstractController
      * @Route(path="/{id}", name="put", methods={ Request::METHOD_PUT })
      * @param Result|null $result
      * @return JsonResponse
+     * @throws \Doctrine\ORM\ORMException
      */
     public function putResult(?Result $result, Request $request): JsonResponse
     {
@@ -170,7 +171,7 @@ class ApiResultController extends AbstractController
     }
 
     /**
-     * @Route(path="/{id}", name="deleteAll", methods={ Request::METHOD_DELETE })
+     * @Route(path="", name="deleteAll", methods={ Request::METHOD_DELETE })
      * @return JsonResponse
      */
     public function deleteAllResults(): JsonResponse

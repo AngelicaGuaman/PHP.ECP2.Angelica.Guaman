@@ -104,7 +104,7 @@
         ],
         "summary": "Provides the list of HTTP supported methods",
         "description": "Return a `Allow` header with a list of HTTP supported methods.",
-        "operationId": "miw_options_users",
+        "operationId": "api_user_options",
         "responses": {
           "200": {
             "description": "`Allow` header ",
@@ -229,12 +229,122 @@
         ],
         "summary": "Provides the list of HTTP supported methods",
         "description": "Return a `Allow` header with a list of HTTP supported methods.",
-        "operationId": "miw_options_users_id",
+        "operationId": "api_user_options_id",
         "parameters": [
           {
             "$ref": "#/components/parameters/userId"
           }
         ],
+        "responses": {
+          "200": {
+            "description": "`Allow` header ",
+            "headers": {
+              "allow": {
+                "description": "List of HTTP supported methods",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/results": {
+      "get": {
+        "tags": [
+          "Results"
+        ],
+        "summary": "Returns all results",
+        "description": "Returns all results from the system that the user has access to.",
+        "operationId": "api_result_getAll",
+        "responses": {
+          "200": {
+            "description": "Result array response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultArray"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/404_Resource_Not_Found_Response"
+          }
+        }
+      },
+      "delete":{
+        "tags": [
+          "Results"
+        ],
+        "summary": "Deletes all results",
+        "description": "Deletes all results from the system that the user has access to.",
+        "operationId": "api_result_deleteAll",
+        "responses": {
+          "204": {
+            "description": "Result deleted"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Results"
+        ],
+        "summary": "Creates a new result",
+        "description": "Creates a new result",
+        "operationId": "api_result_post",
+        "responses": {
+          "201": {
+            "description": "`Created` Result created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Result"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "`Bad Request` Username or email already exists.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "`Unprocessable entity` Username, e-mail or password is left out",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResultData"
+              }
+            }
+          },
+          "description": "`Result` properties to add to the system",
+          "required": true
+        }
+      },
+      "options": {
+        "tags": [
+          "Results"
+        ],
+        "summary": "Provides the list of HTTP supported methods",
+        "description": "Return a `Allow` header with a list of HTTP supported methods.",
+        "operationId": "api_result_options",
         "responses": {
           "200": {
             "description": "`Allow` header ",
@@ -263,7 +373,7 @@
   ],
   "servers": [
     {
-      "url": "http://localhost:8000/api/v1"
+      "url": "http://127.0.0.1:8000/api/v1"
     }
   ],
   "components": {
@@ -451,34 +561,22 @@
       },
 	   "ResultData": {
         "required": [
-          "user",
+          "user_id",
 		  "result"
         ],
         "properties": {
-          "user": {
+          "user_id": {
             "description": "User object",
-            "type": "object"
+            "type": "int32"
           },
           "result": {
             "description": "Result",
             "type": "int32"
-          },
-          "time": {
-            "description": "Creation date",
-            "type": "string"
           }
         },
         "example": {
-          "user": {
-            "id": 1508,
-            "username": "User name",
-            "email": "User email",
-			"password": "*user*",
-            "enabled": true,
-            "admin": false
-          }, 
-		  "result": 240,
-		  "time": "2018-01-03 14:14:00"
+          "user_id": 1,
+		  "result": 240
         }
       },
       "ResultArray": {
