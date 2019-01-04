@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use Doctrine\ORM\EntityManager;
+use App\Entity\Result;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -57,7 +59,7 @@ class ApiUserResultsController extends AbstractController
         /** @var Result[] $results */
         $results = $this->getDoctrine()
             ->getRepository(Result::class)
-            ->findBy(['user_id' => $user['id']]);
+            ->findBy(['user' => $user->getId()]);
 
         foreach ($results as $result) {
             $em->remove($result);

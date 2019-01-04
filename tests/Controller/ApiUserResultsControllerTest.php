@@ -58,7 +58,7 @@ class ApiUserResultsControllerTest extends WebTestCase
         );
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
-        self::assertArrayHasKey('users', $datosRecibidos);
+        self::assertArrayHasKey('results', $datosRecibidos);
         dump($datosRecibidos, '<<<<<< GET ALL USERS 200');
     }
 	
@@ -83,7 +83,7 @@ class ApiUserResultsControllerTest extends WebTestCase
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
         self::assertEquals(Response::HTTP_NOT_FOUND, $datosRecibidos["message"]["code"]);
-        self::assertEquals("NOT FOUND", $datosRecibidos["message"]["message"]);
+        self::assertEquals("USER no existe", $datosRecibidos["message"]["message"]);
 		
 		dump($datosRecibidos, '<<<<<< GET RESULTS BY USER_ID 404');
     }
