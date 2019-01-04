@@ -250,6 +250,80 @@
         }
       }
     },
+	"/users/{userId}/results": {
+      "get": {
+        "tags": [
+          "UserResults"
+        ],
+        "summary": "Returns all results of a userID",
+        "description": "Returns the results of `userId`.",
+        "operationId": "api_user_results_getAll",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Result array",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResultArray"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/404_Resource_Not_Found_Response"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "UserResults"
+        ],
+        "summary": "Deletes all results",
+        "description": "Deletes the results of a `userId`.",
+        "operationId": "api_user_results_deleteAll",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userId"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Results deleted"
+          }
+        }
+      },
+      "options": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Provides the list of HTTP supported methods",
+        "description": "Return a `Allow` header with a list of HTTP supported methods.",
+        "operationId": "api_user_results_options",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/userId"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "`Allow` header ",
+            "headers": {
+              "allow": {
+                "description": "List of HTTP supported methods",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/results": {
       "get": {
         "tags": [
@@ -481,6 +555,10 @@
     {
       "name": "Users",
       "description": "User management"
+    },
+	{
+      "name": "UserResults",
+      "description": "User's results management"
     },
     {
       "name": "Results",
