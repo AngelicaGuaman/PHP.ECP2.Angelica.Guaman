@@ -47,7 +47,7 @@ class ApiUserControllerTest extends WebTestCase
     }
 
     /**
-     * @Implements testPostUser201
+     * Implements testPostUser201
      * @covers ::postUser
      * @return int
      */
@@ -83,7 +83,7 @@ class ApiUserControllerTest extends WebTestCase
     }
 
     /**
-     * @Implements testPostUser422
+     * Implements testPostUser422
      * @depends testPostUser201
      * @covers ::postUser
      * @covers ::error
@@ -116,7 +116,7 @@ class ApiUserControllerTest extends WebTestCase
     }
 
     /**
-     * @Implements testPostUser400
+     * Implements testPostUser400
      * @depends testPostUser201
      * @covers ::postUser
      * @covers ::error
@@ -151,7 +151,7 @@ class ApiUserControllerTest extends WebTestCase
 
 
     /**
-     * @Implements testGetUser200
+     * Implements testGetUser200
      * @depends testPostUser201
      * @covers ::findById
      * @param int $id
@@ -211,7 +211,7 @@ class ApiUserControllerTest extends WebTestCase
     }
 
     /**
-     * @Implements testPutUser400
+     * Implements testPutUser400
      * @depends testGetUser200
      * @covers ::putUser
      * @covers ::error
@@ -248,7 +248,7 @@ class ApiUserControllerTest extends WebTestCase
     }
 
     /**
-     * @Implements testPutUser200
+     * Implements testPutUser200
      * @depends testGetUser200
      * @covers ::putUser
      * @param array $user
@@ -286,7 +286,7 @@ class ApiUserControllerTest extends WebTestCase
     }
 
     /**
-     * @Implements testPutUser422
+     * Implements testPutUser422
      * @depends testGetUser200
      * @covers ::putUser
      * @covers ::error
@@ -349,4 +349,72 @@ class ApiUserControllerTest extends WebTestCase
         dump($datosRecibidos, '<<<<<< PUT USER 404');
     }
 
+    /**
+     * Implements testDeleteUser204
+     * @depends testPostUser201
+     * @covers ::deleteOneUser
+     * @param int $id
+     */
+    public function testDeleteUser204(int $id): void
+    {
+        self::$client->request(
+            Request::METHOD_DELETE,
+            UsersController::API_USER . '/' . $id
+        );
+        /** @var Response $response */
+        $response = self::$client->getResponse();
+        self::assertEquals(
+            Response::HTTP_NO_CONTENT,
+            $response->getStatusCode()
+        );
+        self:self::assertEquals("", $response->getContent());
+        dump($response->getContent(), '<<<< DELETE USER 204');
+    }
+
+    /**
+     * Implements testDeleteUser404
+     * @covers ::deleteOneUser
+     */
+    public function testDeleteUser404(): void
+    {
+        $id = -1;
+
+        self::$client->request(
+            Request::METHOD_DELETE,
+            UsersController::API_USER . '/' . $id
+        );
+        /** @var Response $response */
+        $response = self::$client->getResponse();
+        self::assertEquals(
+            Response::HTTP_NOT_FOUND,
+            $response->getStatusCode()
+        );
+
+        self::assertJson($response->getContent());
+        $datosRecibidos = json_decode($response->getContent(), true);
+        self::assertEquals(Response::HTTP_NOT_FOUND, $datosRecibidos["message"]["code"]);
+        self::assertEquals("NOT FOUND", $datosRecibidos["message"]["message"]);
+        dump($response->getContent(), '<<<< DELETE USER 204');
+    }
+
+    /**
+     * Implements testDeleteUsers204
+     * @depends testPostUser201
+     * @covers ::deleteAllUsers
+     */
+    public function testDeleteUsers204(): void
+    {
+        self::$client->request(
+            Request::METHOD_DELETE,
+            UsersController::API_USER
+        );
+        /** @var Response $response */
+        $response = self::$client->getResponse();
+        self::assertEquals(
+            Response::HTTP_NO_CONTENT,
+            $response->getStatusCode()
+        );
+        self:self::assertEquals("", $response->getContent());
+        dump($response->getContent(), '<<<< DELETE ALL USERS 204');
+    }
 }
