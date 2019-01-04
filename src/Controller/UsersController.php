@@ -231,6 +231,24 @@ class UsersController extends AbstractController
     }
 
     /**
+     * @Route(path="", name="options", methods={ Request::METHOD_OPTIONS })
+     * @return JsonResponse
+     */
+    public function optionsAllUsers(): JsonResponse
+    {
+        return new JsonResponse(null, Response::HTTP_OK, array("Allow" => "GET, POST, DELETE, OPTIONS"));
+    }
+	
+	/**
+     * @Route(path="/{id}", name="options_id", methods={ Request::METHOD_OPTIONS })
+     * @return JsonResponse
+     */
+    public function optionsUser(): JsonResponse
+    {
+        return new JsonResponse(null, Response::HTTP_OK, array("Allow" => "GET, PUT, DELETE, OPTIONS"));
+    }
+    
+    /**
      * @param int $statusCode
      * @param string $message
      *
