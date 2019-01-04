@@ -111,7 +111,7 @@ class ApiResultController extends AbstractController
     public function putResult(?Result $result, Request $request): JsonResponse
     {
         if (null === $result) {
-            return $this->error(Response::HTTP_NOT_FOUND, 'NOT FOUND');
+            return $this->error(Response::HTTP_NOT_FOUND, 'RESULT NOT FOUND');
         }
 
         /** @var EntityManager $em */
