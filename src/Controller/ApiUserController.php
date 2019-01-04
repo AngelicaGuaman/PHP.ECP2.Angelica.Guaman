@@ -11,13 +11,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class UsersController
+ * Class ApiUserController
  *
  * @package App\Controller
  *
- * @Route(path=UsersController::API_USER, name="api_user_")
+ * @Route(path=ApiUserController::API_USER, name="api_user_")
  */
-class UsersController extends AbstractController
+class ApiUserController extends AbstractController
 {
 
     public const API_USER = '/api/v1/users';

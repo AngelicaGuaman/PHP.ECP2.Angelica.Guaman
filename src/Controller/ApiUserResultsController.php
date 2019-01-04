@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use Doctrine\ORM\EntityManager;
 use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -11,13 +10,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
- * Class ApiUserResultController
+ * Class ApiUserResultsController
  *
  * @package App\Controller
  *
- * @Route(path=UsersController::API_USER, name="api_user_results_")
+ * @Route(path=ApiUserResultsController::API_USER, name="api_user_results_")
  */
-class ApiUserResultController extends AbstractController
+class ApiUserResultsController extends AbstractController
 {
 
     public const API_USER = '/api/v1/users';
