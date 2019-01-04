@@ -299,7 +299,7 @@
       },
       "options": {
         "tags": [
-          "Users"
+          "UserResults"
         ],
         "summary": "Provides the list of HTTP supported methods",
         "description": "Return a `Allow` header with a list of HTTP supported methods.",
@@ -525,7 +525,7 @@
       },
       "options": {
         "tags": [
-          "Users"
+          "Results"
         ],
         "summary": "Provides the list of HTTP supported methods",
         "description": "Return a `Allow` header with a list of HTTP supported methods.",
