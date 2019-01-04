@@ -283,7 +283,7 @@
         "tags": [
           "UserResults"
         ],
-        "summary": "Deletes all results",
+        "summary": "Deletes all results of a userId",
         "description": "Deletes the results of a `userId`.",
         "operationId": "api_user_results_deleteAll",
         "parameters": [
