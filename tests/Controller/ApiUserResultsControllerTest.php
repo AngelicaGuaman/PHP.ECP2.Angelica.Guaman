@@ -2,11 +2,14 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\UsersController;
+use App\Controller\ApiResultController;
+use App\Controller\ApiUserController;
+use App\Controller\ApiUserResultsController;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+
 
 /**
  * Class ApiUserResultsControllerTest
@@ -18,18 +21,20 @@ class ApiUserResultsControllerTest extends WebTestCase
 {
     /** @var Client $client */
     private static $client;
-	
-	/** @var User $user */
+
     private static $user;
-	
-	/** @var Result $result */
+
     private static $result;
+
+    private static $result2;
 
     public static function setUpBeforeClass()
     {
         self::$client = static::createClient();
 		self::$user = static::createUser();
-		self::$result = static::createResult();
+        dump(self::$user, '<<<<<< USER');
+		self::$result = static::createObjectResult(self::$user['id']);
+        self::$result2 = static::createObjectResult(self::$user['id']);
     }
 
 
@@ -39,7 +44,7 @@ class ApiUserResultsControllerTest extends WebTestCase
      */
     public function testGetAllResultsByUserId200()
     {
-		$userid = self::$user['id'];
+		$userId = self::$user['id'];
 		
         self::$client->request(
             Request::METHOD_GET,
@@ -89,7 +94,7 @@ class ApiUserResultsControllerTest extends WebTestCase
      */
     public function testDeleteResultsByUserId204(): void
     {
-		$userid = self::$user['id'];
+		$userId = self::$user['id'];
 		
         self::$client->request(
             Request::METHOD_DELETE,
@@ -105,8 +110,8 @@ class ApiUserResultsControllerTest extends WebTestCase
         dump($response->getContent(), '<<<< DELETE RESULTS BY USER_ID 204');
     }
 
-	/**
-     * @return int
+    /**
+     * @return array
      */
     public static function createUser(): array
     {
@@ -119,7 +124,7 @@ class ApiUserResultsControllerTest extends WebTestCase
         ];
         self::$client->request(
             Request::METHOD_POST,
-            UsersController::API_USER,
+            ApiUserController::API_USER,
             [], [], [], json_encode($datos)
         );
         /** @var Response $response */
@@ -131,17 +136,18 @@ class ApiUserResultsControllerTest extends WebTestCase
         self::assertJson($response->getContent());
         $user = json_decode($response->getContent(), true);
   
-        dump($datosRecibidos, '<<<<<< POST USER PRUEBA');
+        dump($user, '<<<<<< POST USER PRUEBA');
         return $user;
     }
-	
-	/**
-     * @return int
+
+    /**
+     * @param int $userId
+     * @return array
      */
-    public function createResult(): array
+    public static function createObjectResult(int $userId): array
     {
         $datos = [
-            'user_id' => self::$user['id'],
+            'user_id' => $userId,
             'result' => 29,
         ];
         self::$client->request(
@@ -158,15 +164,16 @@ class ApiUserResultsControllerTest extends WebTestCase
         self::assertJson($response->getContent());
         $result = json_decode($response->getContent(), true);
 
-        dump($datosRecibidos, '<<<<<< POST RESULT PRUEBA');
+        dump($result, '<<<<<< POST RESULT PRUEBA');
+
         return $result;
     }
-	
-	public static function tearDownAfterClass()
+
+    public static function tearDownAfterClass()
     {
 		self::$client->request(
             Request::METHOD_DELETE,
-            UsersController::API_USER
+            ApiUserController::API_USER
         );
         /** @var Response $response */
         $response = self::$client->getResponse();

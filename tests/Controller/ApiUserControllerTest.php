@@ -2,7 +2,7 @@
 
 namespace App\Tests\Controller;
 
-use App\Controller\UsersController;
+use App\Controller\ApiUserController;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,7 +32,7 @@ class ApiUserControllerTest extends WebTestCase
     {
         self::$client->request(
             Request::METHOD_GET,
-            UsersController::API_USER
+            ApiUserController::API_USER
         );
         /** @var Response $response */
         $response = self::$client->getResponse();
@@ -62,7 +62,7 @@ class ApiUserControllerTest extends WebTestCase
         ];
         self::$client->request(
             Request::METHOD_POST,
-            UsersController::API_USER,
+            ApiUserController::API_USER,
             [], [], [], json_encode($datos)
         );
         /** @var Response $response */
@@ -98,7 +98,7 @@ class ApiUserControllerTest extends WebTestCase
         ];
         self::$client->request(
             Request::METHOD_POST,
-            UsersController::API_USER,
+            ApiUserController::API_USER,
             [], [], [], json_encode($datos)
         );
         /** @var Response $response */
@@ -132,7 +132,7 @@ class ApiUserControllerTest extends WebTestCase
         ];
         self::$client->request(
             Request::METHOD_POST,
-            UsersController::API_USER,
+            ApiUserController::API_USER,
             [], [], [], json_encode($datos)
         );
         /** @var Response $response */
@@ -161,7 +161,7 @@ class ApiUserControllerTest extends WebTestCase
     {
         self::$client->request(
             Request::METHOD_GET,
-            UsersController::API_USER . '/' . $id
+            ApiUserController::API_USER . '/' . $id
         );
         /** @var Response $response */
         $response = self::$client->getResponse();
@@ -194,7 +194,7 @@ class ApiUserControllerTest extends WebTestCase
 
         self::$client->request(
             Request::METHOD_GET,
-            UsersController::API_USER . '/' . $id
+            ApiUserController::API_USER . '/' . $id
         );
         /** @var Response $response */
         $response = self::$client->getResponse();
@@ -230,7 +230,7 @@ class ApiUserControllerTest extends WebTestCase
         ];
         self::$client->request(
             Request::METHOD_PUT,
-            UsersController::API_USER . '/' . $id,
+            ApiUserController::API_USER . '/' . $id,
             [], [], [], json_encode($datos)
         );
         /** @var Response $response */
@@ -266,7 +266,7 @@ class ApiUserControllerTest extends WebTestCase
         ];
         self::$client->request(
             Request::METHOD_PUT,
-            UsersController::API_USER . '/' . $id,
+            ApiUserController::API_USER . '/' . $id,
             [], [], [], json_encode($datos)
         );
         /** @var Response $response */
@@ -304,7 +304,7 @@ class ApiUserControllerTest extends WebTestCase
         ];
         self::$client->request(
             Request::METHOD_PUT,
-            UsersController::API_USER . '/' . $id,
+            ApiUserController::API_USER . '/' . $id,
             [], [], [], json_encode($datos)
         );
         /** @var Response $response */
@@ -333,7 +333,7 @@ class ApiUserControllerTest extends WebTestCase
 
         self::$client->request(
             Request::METHOD_PUT,
-            UsersController::API_USER . '/' . $id
+            ApiUserController::API_USER . '/' . $id
         );
         /** @var Response $response */
         $response = self::$client->getResponse();
@@ -359,7 +359,7 @@ class ApiUserControllerTest extends WebTestCase
     {
         self::$client->request(
             Request::METHOD_DELETE,
-            UsersController::API_USER . '/' . $id
+            ApiUserController::API_USER . '/' . $id
         );
         /** @var Response $response */
         $response = self::$client->getResponse();
@@ -367,7 +367,8 @@ class ApiUserControllerTest extends WebTestCase
             Response::HTTP_NO_CONTENT,
             $response->getStatusCode()
         );
-        self:self::assertEquals("", $response->getContent());
+        self:
+        self::assertEquals("", $response->getContent());
         dump($response->getContent(), '<<<< DELETE USER 204');
     }
 
@@ -381,7 +382,7 @@ class ApiUserControllerTest extends WebTestCase
 
         self::$client->request(
             Request::METHOD_DELETE,
-            UsersController::API_USER . '/' . $id
+            ApiUserController::API_USER . '/' . $id
         );
         /** @var Response $response */
         $response = self::$client->getResponse();
@@ -406,7 +407,7 @@ class ApiUserControllerTest extends WebTestCase
     {
         self::$client->request(
             Request::METHOD_DELETE,
-            UsersController::API_USER
+            ApiUserController::API_USER
         );
         /** @var Response $response */
         $response = self::$client->getResponse();
@@ -414,7 +415,8 @@ class ApiUserControllerTest extends WebTestCase
             Response::HTTP_NO_CONTENT,
             $response->getStatusCode()
         );
-        self:self::assertEquals("", $response->getContent());
+        self:
+        self::assertEquals("", $response->getContent());
         dump($response->getContent(), '<<<< DELETE ALL USERS 204');
     }
 }
