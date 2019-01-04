@@ -4,6 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Controller\ApiResultController;
 use App\Controller\UsersController;
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\BrowserKit\Client;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,10 +20,14 @@ class ApiResultControllerTest extends WebTestCase
 {
     /** @var Client $client */
     private static $client;
+	
+	/** @var User $user */
+    private static $user;
 
     public static function setUpBeforeClass()
     {
         self::$client = static::createClient();
+		self::$user = static::createUser();
     }
 
     /**
@@ -48,51 +53,14 @@ class ApiResultControllerTest extends WebTestCase
     }
 
     /**
-     * Implements testPostUser201
-     * @covers ::postUser
-     * @return int
-     */
-    public function testPostUser201(): int
-    {
-        $datos = [
-            'username' => '555angelica',
-            'email' => '555angelica.@xyz.com',
-            'password' => '*angelica*',
-            'enabled' => false,
-            'admin' => false
-        ];
-        self::$client->request(
-            Request::METHOD_POST,
-            UsersController::API_USER,
-            [], [], [], json_encode($datos)
-        );
-        /** @var Response $response */
-        $response = self::$client->getResponse();
-        self::assertEquals(
-            Response::HTTP_CREATED,
-            $response->getStatusCode()
-        );
-        self::assertJson($response->getContent());
-        $datosRecibidos = json_decode($response->getContent(), true);
-        self::assertEquals($datos['username'], $datosRecibidos['username']);
-        self::assertEquals($datos['email'], $datosRecibidos['email']);
-        self::assertEquals($datos['enabled'], $datosRecibidos['enabled']);
-        self::assertEquals($datos['admin'], $datosRecibidos['admin']);
-
-        dump($datosRecibidos, '<<<<<< POST USER 201');
-        return $datosRecibidos['id'];
-    }
-
-    /**
      * Implements testPostResult201
-     * @depends testPostUser201
      * @covers ::postResult
      * @return int
      */
-    public function testPostResult201(int $id): int
+    public function testPostResult201(): int
     {
         $datos = [
-            'user_id' => $id,
+            'user_id' => self::$user['id'],
             'result' => 29,
         ];
         self::$client->request(
@@ -116,19 +84,16 @@ class ApiResultControllerTest extends WebTestCase
     }
 
     /**
-     * Implements testPostUser422
-     * @depends testPostUser201
-     * @covers ::postUser
+     * Implements testPostResult422
+     * @covers ::postResult
      * @covers ::error
      */
-    public function testPostUser422(): void
+    public function testPostResult422(): void
     {
         $datos = [
-            'email' => '555angelica.@xyz.com',
-            'password' => '*angelica*',
-            'enabled' => false,
-            'admin' => false
+            'user_id' => self::$user['id']
         ];
+		
         self::$client->request(
             Request::METHOD_POST,
             ApiResultController::API_RESULT,
@@ -142,27 +107,24 @@ class ApiResultControllerTest extends WebTestCase
         );
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
-        self::assertEquals(422, $datosRecibidos["message"]["code"]);
-        self::assertEquals("Falta USERNAME", $datosRecibidos["message"]["message"]);
+        self::assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $datosRecibidos["message"]["code"]);
+        self::assertEquals("Falta RESULT", $datosRecibidos["message"]["message"]);
 
-        dump($datosRecibidos, '<<<<<< POST USER 422');
+        dump($datosRecibidos, '<<<<<< POST RESULT 422');
     }
 
     /**
-     * Implements testPostUser400
-     * @depends testPostUser201
-     * @covers ::postUser
+     * Implements testPostResult404
+     * @covers ::postResult
      * @covers ::error
      */
-    public function testPostUser400(): void
+    public function testPostResult404(): void
     {
         $datos = [
-            'username' => '555angelica',
-            'email' => '555angelica.@xyz.com',
-            'password' => '*angelica*',
-            'enabled' => false,
-            'admin' => false
+            'user_id' => -1,
+            'result' => 555
         ];
+		
         self::$client->request(
             Request::METHOD_POST,
             ApiResultController::API_RESULT,
@@ -171,26 +133,26 @@ class ApiResultControllerTest extends WebTestCase
         /** @var Response $response */
         $response = self::$client->getResponse();
         self::assertEquals(
-            Response::HTTP_BAD_REQUEST,
+            Response::HTTP_NOT_FOUND,
             $response->getStatusCode()
         );
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
-        self::assertEquals(Response::HTTP_BAD_REQUEST, $datosRecibidos["message"]["code"]);
-        self::assertEquals("USERNAME ya existe", $datosRecibidos["message"]["message"]);
+        self::assertEquals(Response::HTTP_NOT_FOUND, $datosRecibidos["message"]["code"]);
+        self::assertEquals("USER no existe", $datosRecibidos["message"]["message"]);
 
-        dump($datosRecibidos, '<<<<<< POST USER 400');
+        dump($datosRecibidos, '<<<<<< POST RESULT 404');
     }
 
 
     /**
      * Implements testGetUser200
-     * @depends testPostUser201
+     * @depends testPostResult201
      * @covers ::findById
      * @param int $id
-     * @return array $user
+     * @return array $result
      */
-    public function testGetUser200(int $id): array
+    public function testGetResult200(int $id): array
     {
         self::$client->request(
             Request::METHOD_GET,
@@ -205,23 +167,22 @@ class ApiResultControllerTest extends WebTestCase
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
         self::assertArrayHasKey('id', $datosRecibidos);
-        self::assertArrayHasKey('username', $datosRecibidos);
-        self::assertArrayHasKey('email', $datosRecibidos);
-        self::assertArrayHasKey('enabled', $datosRecibidos);
-        self::assertArrayHasKey('admin', $datosRecibidos);
+        self::assertArrayHasKey('result', $datosRecibidos);
+        self::assertArrayHasKey('time', $datosRecibidos);
+        self::assertArrayHasKey('user', $datosRecibidos);
         self::assertEquals($id, $datosRecibidos['id']);
 
-        dump($datosRecibidos, '<<<<<< GET USER 200');
+        dump($datosRecibidos, '<<<<<< GET RESULT 200');
 
         return $datosRecibidos;
     }
 
     /**
-     * Implements testGetUser404
+     * Implements testGetResult404
      * @covers ::findById
      * @covers ::error
      */
-    public function testGetUser404()
+    public function testGetResult404()
     {
         $id = -1;
 
@@ -237,30 +198,26 @@ class ApiResultControllerTest extends WebTestCase
         );
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
-        self::assertEquals(404, $datosRecibidos["message"]["code"]);
+        self::assertEquals(Response::HTTP_NOT_FOUND, $datosRecibidos["message"]["code"]);
         self::assertEquals("NOT FOUND", $datosRecibidos["message"]["message"]);
 
-        dump($datosRecibidos, '<<<<<< GET USER 404');
+        dump($datosRecibidos, '<<<<<< GET RESULT 404');
     }
 
     /**
-     * Implements testPutUser400
-     * @depends testGetUser200
-     * @covers ::putUser
+     * Implements testPutResult404
+     * @covers ::putResult
      * @covers ::error
-     * @param array $user
      */
-    public function testPutUser400(array $user): void
+    public function testPutResult404ResultNotFound(): void
     {
-        $id = $user['id'];
+        $id = -1;
 
         $datos = [
-            'username' => '555angelica',
-            'email' => '555angelica.@xyz.com',
-            'password' => '*angelica*',
-            'enabled' => false,
-            'admin' => false
+            'user_id' => self::$user['id'],
+            'rsult' => 555
         ];
+		
         self::$client->request(
             Request::METHOD_PUT,
             ApiResultController::API_RESULT . '/' . $id,
@@ -269,34 +226,67 @@ class ApiResultControllerTest extends WebTestCase
         /** @var Response $response */
         $response = self::$client->getResponse();
         self::assertEquals(
-            Response::HTTP_BAD_REQUEST,
+            Response::HTTP_NOT_FOUND,
             $response->getStatusCode()
         );
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
-        self::assertEquals(Response::HTTP_BAD_REQUEST, $datosRecibidos["message"]["code"]);
-        self::assertEquals("USERNAME ya existe", $datosRecibidos["message"]["message"]);
+        self::assertEquals(Response::HTTP_NOT_FOUND, $datosRecibidos["message"]["code"]);
+        self::assertEquals("RESULT NOT FOUND", $datosRecibidos["message"]["message"]);
 
-        dump($datosRecibidos, '<<<<<< PUT USER 400');
+        dump($datosRecibidos, '<<<<<< PUT RESULT 404 RESULT NOT FOUND');
+    }
+	
+	/**
+     * Implements testPutResult404
+     * @depends testGetResult200
+     * @covers ::putResult
+     * @covers ::error
+     * @param array $result
+     */
+    public function testPutResult404UserNotFound(array $result): void
+    {
+        $id = $result['id'];
+
+        $datos = [
+            'user_id' => -1,
+            'rsult' => 555
+        ];
+		
+        self::$client->request(
+            Request::METHOD_PUT,
+            ApiResultController::API_RESULT . '/' . $id,
+            [], [], [], json_encode($datos)
+        );
+        /** @var Response $response */
+        $response = self::$client->getResponse();
+        self::assertEquals(
+            Response::HTTP_NOT_FOUND,
+            $response->getStatusCode()
+        );
+        self::assertJson($response->getContent());
+        $datosRecibidos = json_decode($response->getContent(), true);
+        self::assertEquals(Response::HTTP_NOT_FOUND, $datosRecibidos["message"]["code"]);
+        self::assertEquals("USER no existe", $datosRecibidos["message"]["message"]);
+
+        dump($datosRecibidos, '<<<<<< PUT RESULT 404 USER NOT FOUND');
     }
 
     /**
-     * Implements testPutUser200
-     * @depends testGetUser200
-     * @covers ::putUser
-     * @param array $user
+     * Implements testPutResult200
+     * @depends testGetResult200
+     * @covers ::putResult
+     * @param array $result
      */
-    public function testPutUser200(array $user): void
+    public function testPutResult200(array $result): void
     {
-        $id = $user['id'];
+        $id = $result['id'];
 
         $datos = [
-            'username' => 'new_angelica',
-            'email' => 'new_angelica.@xyz.com',
-            'password' => 'new_*angelica*',
-            'enabled' => false,
-            'admin' => false
+            'user_id' => self::$user['id'],
+            'rsult' => 555
         ];
+		
         self::$client->request(
             Request::METHOD_PUT,
             ApiResultController::API_RESULT . '/' . $id,
@@ -310,31 +300,27 @@ class ApiResultControllerTest extends WebTestCase
         );
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
-        self::assertEquals($datos['username'], $datosRecibidos['username']);
-        self::assertEquals($datos['email'], $datosRecibidos['email']);
-        self::assertEquals($datos['enabled'], $datosRecibidos['enabled']);
-        self::assertEquals($datos['admin'], $datosRecibidos['admin']);
+        self::assertEquals($datos['user_id'], $datosRecibidos['user']['id']);
+        self::assertEquals($datos['result'], $datosRecibidos['result']);
 
-        dump($datosRecibidos, '<<<<<< PUT USER 200');
+        dump($datosRecibidos, '<<<<<< PUT RESULT 200');
     }
 
     /**
-     * Implements testPutUser422
-     * @depends testGetUser200
-     * @covers ::putUser
+     * Implements testPutResult422
+     * @depends testGetResult200
+     * @covers ::putResult
      * @covers ::error
-     * @param array $user
+     * @param array $result
      */
-    public function testPutUser422(array $user): void
+    public function testPutResult422(array $result): void
     {
-        $id = $user['id'];
+        $id = $result['id'];
 
         $datos = [
-            'email' => '555angelica.@xyz.com',
-            'password' => '*angelica*',
-            'enabled' => false,
-            'admin' => false
+            'user_id' => self::$user['id']
         ];
+		
         self::$client->request(
             Request::METHOD_PUT,
             ApiResultController::API_RESULT . '/' . $id,
@@ -349,46 +335,18 @@ class ApiResultControllerTest extends WebTestCase
         self::assertJson($response->getContent());
         $datosRecibidos = json_decode($response->getContent(), true);
         self::assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $datosRecibidos["message"]["code"]);
-        self::assertEquals("Falta USERNAME", $datosRecibidos["message"]["message"]);
+        self::assertEquals("Falta RESULT", $datosRecibidos["message"]["message"]);
 
-        dump($datosRecibidos, '<<<<<< PUT USER 422');
-    }
-
-
-    /**
-     * Implements testPutUser404
-     * @covers ::putUser
-     * @covers ::error
-     */
-    public function testPutUser404()
-    {
-        $id = -1;
-
-        self::$client->request(
-            Request::METHOD_PUT,
-            ApiResultController::API_RESULT . '/' . $id
-        );
-        /** @var Response $response */
-        $response = self::$client->getResponse();
-        self::assertEquals(
-            Response::HTTP_NOT_FOUND,
-            $response->getStatusCode()
-        );
-        self::assertJson($response->getContent());
-        $datosRecibidos = json_decode($response->getContent(), true);
-        self::assertEquals(Response::HTTP_NOT_FOUND, $datosRecibidos["message"]["code"]);
-        self::assertEquals("NOT FOUND", $datosRecibidos["message"]["message"]);
-
-        dump($datosRecibidos, '<<<<<< PUT USER 404');
+        dump($datosRecibidos, '<<<<<< PUT RESULT 422');
     }
 
     /**
-     * Implements testDeleteUser204
-     * @depends testPostUser201
-     * @covers ::deleteOneUser
+     * Implements testDeleteResult204
+     * @depends testPostResult201
+     * @covers ::deleteOneResult
      * @param int $id
      */
-    public function testDeleteUser204(int $id): void
+    public function testDeleteResult204(int $id): void
     {
         self::$client->request(
             Request::METHOD_DELETE,
@@ -402,14 +360,14 @@ class ApiResultControllerTest extends WebTestCase
         );
         self:
         self::assertEquals("", $response->getContent());
-        dump($response->getContent(), '<<<< DELETE USER 204');
+        dump($response->getContent(), '<<<< DELETE RESULT 204');
     }
 
     /**
-     * Implements testDeleteUser404
-     * @covers ::deleteOneUser
+     * Implements testDeleteResult404
+     * @covers ::deleteOneResult
      */
-    public function testDeleteUser404(): void
+    public function testDeleteResult404(): void
     {
         $id = -1;
 
@@ -428,15 +386,15 @@ class ApiResultControllerTest extends WebTestCase
         $datosRecibidos = json_decode($response->getContent(), true);
         self::assertEquals(Response::HTTP_NOT_FOUND, $datosRecibidos["message"]["code"]);
         self::assertEquals("NOT FOUND", $datosRecibidos["message"]["message"]);
-        dump($response->getContent(), '<<<< DELETE USER 204');
+        dump($response->getContent(), '<<<< DELETE RESULT 404');
     }
 
     /**
-     * Implements testDeleteUsers204
-     * @depends testPostUser201
-     * @covers ::deleteAllUsers
+     * Implements testDeleteResults204
+     * @depends testPostResult201
+     * @covers ::deleteAllResults
      */
-    public function testDeleteUsers204(): void
+    public function testDeleteResults204(): void
     {
         self::$client->request(
             Request::METHOD_DELETE,
@@ -450,6 +408,51 @@ class ApiResultControllerTest extends WebTestCase
         );
         self:
         self::assertEquals("", $response->getContent());
-        dump($response->getContent(), '<<<< DELETE ALL USERS 204');
+        dump($response->getContent(), '<<<< DELETE ALL RESULT 204');
     }
-}
+	
+	 /**
+     * @return int
+     */
+    public static function createUser(): array
+    {
+        $datos = [
+            'username' => 'angelica',
+            'email' => 'angelica.@xyz.com',
+            'password' => '*angelica*',
+            'enabled' => false,
+            'admin' => false
+        ];
+        self::$client->request(
+            Request::METHOD_POST,
+            UsersController::API_USER,
+            [], [], [], json_encode($datos)
+        );
+        /** @var Response $response */
+        $response = self::$client->getResponse();
+        self::assertEquals(
+            Response::HTTP_CREATED,
+            $response->getStatusCode()
+        );
+        self::assertJson($response->getContent());
+        $user = json_decode($response->getContent(), true);
+  
+        dump($datosRecibidos, '<<<<<< POST USER PRUEBA');
+        return $user;
+    }
+	
+	public static function tearDownAfterClass()
+    {
+		 self::$client->request(
+            Request::METHOD_DELETE,
+            UsersController::API_USER
+        );
+        /** @var Response $response */
+        $response = self::$client->getResponse();
+        self::assertEquals(
+            Response::HTTP_NO_CONTENT,
+            $response->getStatusCode()
+        );
+        self:self::assertEquals("", $response->getContent());
+        dump($response->getContent(), '<<<< DELETE ALL USERS 204');
+	}
